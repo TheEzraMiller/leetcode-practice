@@ -9,7 +9,7 @@
  * @param nums
  */
 function threeSum(nums: number[]): number[][] {
-    const result: number[][] = [];
+    const result: number[][] = []
     nums.forEach((num, key) => {
         nums.forEach((num2, key2) => {
             nums.forEach((num3, key3) => {
@@ -18,19 +18,7 @@ function threeSum(nums: number[]): number[][] {
                 }
                 if (num + num2 + num3 === 0) { // valid result
                     let isPresentResult = false
-                    result.forEach(res => {
-                        if (
-                            res[0] === num && res[1] === num2 && res[2] === num3
-                            || res[1] === num && res[2] === num2 && res[0] === num3
-                            || res[2] === num && res[0] === num2 && res[1] === num3
-                            //
-                            || res[0] === num && res[2] === num2 && res[1] === num3
-                            || res[1] === num && res[0] === num2 && res[2] === num3
-                            || res[2] === num && res[1] === num2 && res[0] === num3
-                        ) {
-                            isPresentResult = true
-                        }
-                    })
+                    result.forEach(res => isPresentResult = checkPresent(res, [num, num2, num3]) || isPresentResult)
                     if (!isPresentResult) {
                         result.push([num, num2, num3])
                     }
@@ -41,6 +29,20 @@ function threeSum(nums: number[]): number[][] {
     return result
 }
 
+function checkPresent(res: number[], newRes: number[]): boolean {
+    // Sort both so they are in correct order
+    res.sort()
+    newRes.sort()
+
+    for (const [key, num] of res.entries()) {
+        if (num !== newRes[key]) { // found mismatching element - no further looking
+            return false // return but from the `checkPresent` not just `forEach`
+        }
+    }
+
+    return true
+}
+
 console.log('result:',
     threeSum([-1, 0, 1, 2, -1, -4])
-);
+)
