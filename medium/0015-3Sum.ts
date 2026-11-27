@@ -9,6 +9,8 @@
  * @param nums
  */
 export default function threeSum(nums: number[]): number[][] {
+    nums.sort((a, b) => a - b)
+
     const fullResult: Record<string, number[]> = {}
     const outerNums: number[] = []
     nums.forEach((num, key) => {
@@ -17,14 +19,14 @@ export default function threeSum(nums: number[]): number[][] {
         }
         outerNums.push(num)
         const needed = 0 - num
-        const usableNums = nums.slice(key + 1) // start after the element we're inspecting on outer loop
+        const usableNums = nums.toSpliced(key, 1) // start after the element we're inspecting on outer loop
 
         const twoResultAll = Object.values(twoSum(usableNums, needed))
         if (twoResultAll.length) { // if result found, add `num` we were working on & finish
             twoResultAll.forEach(twoResult => {
                 twoResult.push(num)
 
-                fullResult[twoResult.toSorted().join('_')] = twoResult
+                fullResult[twoResult.sort().join('_')] = twoResult
             })
         }
     })
@@ -32,18 +34,25 @@ export default function threeSum(nums: number[]): number[][] {
 }
 
 function twoSum(nums: number[], target: number): Record<string, number[]> {
-    const available: number[] = []
     const allAvailable: Record<string, number[]> = {}
+    let key2 = nums.length - 1
     for (let key = 0; key < nums.length; key++) {
-        const num = nums[key]
-        const needed = target - num
+        const num = nums[key] // first
+        const num2 = nums[key2] // last
 
-        // Check if present
-        if (available[needed]) {
-            allAvailable[num + '_' + needed] = [num, needed]
+        if (key === key2) {
+            break // no more places to look
         }
 
-        available[num] = 1
+        if (num + num2 === target) {
+            allAvailable[num + '_' + num2] = [num, num2]
+            continue
+        }
+
+        if (num + num2 > target) {
+            key2--
+            key-- // Don't let it increment
+        }
     }
     return allAvailable
 }
