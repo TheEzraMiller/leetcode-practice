@@ -54,11 +54,11 @@ function twoSum(nums: number[], target: number): number[] {
 
 function checkPresent(res: number[], newRes: number[]): boolean {
     // Sort both so they are in correct order
-    res.sort()
-    newRes.sort()
+    const r = res.toSorted()
+    const nr = newRes.toSorted()
 
-    for (const [key, num] of res.entries()) {
-        if (num !== newRes[key]) { // found mismatching element - no further looking
+    for (const [key, num] of r.entries()) {
+        if (num !== nr[key]) { // found mismatching element - no further looking
             return false // return but from the `checkPresent` not just `forEach`
         }
     }

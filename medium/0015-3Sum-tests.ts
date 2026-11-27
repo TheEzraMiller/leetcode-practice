@@ -41,6 +41,19 @@ test('Example 3', () => {
     )
 })
 
+test('Example 4', () => {
+    const input = [-4, 4, 0, 0, 0]
+    const expected = [[-4, 0, 4], [0, 0, 0]]
+
+    const actual = threeSum(input)
+
+    // assert.deepStrictEqual(actual, expected)
+    assert.deepStrictEqual(
+        normalise(actual),
+        normalise(expected)
+    )
+})
+
 function normalise(result: number[][]): number[][] {
     return result
         .map(triplet => triplet.toSorted((a, b) => a - b))
