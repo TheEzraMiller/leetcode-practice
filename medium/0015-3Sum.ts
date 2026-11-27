@@ -9,59 +9,41 @@
  * @param nums
  */
 export default function threeSum(nums: number[]): number[][] {
-    const fullResult: number[][] = []
+    const fullResult: Record<string, number[]> = {}
+    const outerNums: number[] = []
     nums.forEach((num, key) => {
+        if (outerNums.indexOf(num) !== -1) { // we've seen this first digit already - no need to repeat
+            return
+        }
+        outerNums.push(num)
         const needed = 0 - num
-        let usableNums = nums.toSpliced(key, 1)
+        const usableNums = nums.slice(key + 1) // start after the element we're inspecting on outer loop
 
-        while (usableNums.length >= 2) { // While there is something to search
-            const twoResult = twoSum(usableNums, needed)
-            if (twoResult.length) { // if result found, add `num` we were working on & finish
+        const twoResultAll = Object.values(twoSum(usableNums, needed))
+        if (twoResultAll.length) { // if result found, add `num` we were working on & finish
+            twoResultAll.forEach(twoResult => {
                 twoResult.push(num)
 
-                let isPresentResult = false
-                fullResult.forEach(res => isPresentResult = checkPresent(res, twoResult) || isPresentResult)
-
-                if (!isPresentResult) {
-                    fullResult.push(twoResult)
-                }
-
-                // Throw out found elements
-                usableNums = usableNums.filter(num => num !== twoResult[0] && num !== twoResult[1])
-            } else {
-                break // if we didn't find any results - not worth searching again
-            }
+                fullResult[twoResult.toSorted().join('_')] = twoResult
+            })
         }
     })
-    return fullResult
+    return Object.values(fullResult)
 }
 
-function twoSum(nums: number[], target: number): number[] {
+function twoSum(nums: number[], target: number): Record<string, number[]> {
     const available: number[] = []
+    const allAvailable: Record<string, number[]> = {}
     for (let key = 0; key < nums.length; key++) {
         const num = nums[key]
         const needed = target - num
 
         // Check if present
         if (available[needed]) {
-            return [num, needed]
+            allAvailable[num + '_' + needed] = [num, needed]
         }
 
         available[num] = 1
     }
-    return []
-}
-
-function checkPresent(res: number[], newRes: number[]): boolean {
-    // Sort both so they are in correct order
-    const r = res.toSorted()
-    const nr = newRes.toSorted()
-
-    for (const [key, num] of r.entries()) {
-        if (num !== nr[key]) { // found mismatching element - no further looking
-            return false // return but from the `checkPresent` not just `forEach`
-        }
-    }
-
-    return true
+    return allAvailable
 }
