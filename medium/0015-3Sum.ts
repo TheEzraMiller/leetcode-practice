@@ -8,28 +8,48 @@
  *
  * @param nums
  */
-function threeSum(nums: number[]): number[][] {
-    const result: number[][] = []
-    const len = nums.length
+export default function threeSum(nums: number[]): number[][] {
+    const fullResult: number[][] = []
     nums.forEach((num, key) => {
-        for (let key2 = key + 1; key2 < len; key2++) {
-            for (let key3 = key2 + 1; key3 < len; key3++) {
-                if (key === key2 || key2 === key3 || key === key3) {
-                    return // no re-using allowed
+        const needed = 0 - num
+        let usableNums = nums.toSpliced(key, 1)
+
+        while (usableNums.length >= 2) { // While there is something to search
+            const twoResult = twoSum(usableNums, needed)
+            if (twoResult.length) { // if result found, add `num` we were working on & finish
+                twoResult.push(num)
+
+                let isPresentResult = false
+                fullResult.forEach(res => isPresentResult = checkPresent(res, twoResult) || isPresentResult)
+
+                if (!isPresentResult) {
+                    fullResult.push(twoResult)
                 }
-                const num2 = nums[key2]
-                const num3 = nums[key3]
-                if (num + num2 + num3 === 0) { // valid result
-                    let isPresentResult = false
-                    result.forEach(res => isPresentResult = checkPresent(res, [num, num2, num3]) || isPresentResult)
-                    if (!isPresentResult) {
-                        result.push([num, num2, num3])
-                    }
-                }
+
+                // Throw out found elements
+                usableNums = usableNums.filter(num => num !== twoResult[0] && num !== twoResult[1])
+            } else {
+                break // if we didn't find any results - not worth searching again
             }
         }
     })
-    return result
+    return fullResult
+}
+
+function twoSum(nums: number[], target: number): number[] {
+    const available: number[] = []
+    for (let key = 0; key < nums.length; key++) {
+        const num = nums[key]
+        const needed = target - num
+
+        // Check if present
+        if (available[needed]) {
+            return [num, needed]
+        }
+
+        available[num] = 1
+    }
+    return []
 }
 
 function checkPresent(res: number[], newRes: number[]): boolean {
@@ -45,7 +65,3 @@ function checkPresent(res: number[], newRes: number[]): boolean {
 
     return true
 }
-
-console.log('result:',
-    threeSum([-1, 0, 1, 2, -1, -4])
-)
